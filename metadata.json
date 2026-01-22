@@ -1,0 +1,7 @@
+{
+  "name": "2026 만화경 연하장",
+  "description": "달리는 붉은 말의 기운을 담은 2026년 새해맞이 디지털 만화경 연하장입니다.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

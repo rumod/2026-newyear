@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>2026 만화경 연하장</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;900&family=Outfit:wght@200;600&family=Noto+Sans+KR:wght@300;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-cream: #FEF7E5;
+      --color-red: #F15A2B;
+      --color-blue: #8CBEE3;
+      --color-dark-blue: #212C3A;
+      --color-orange: #FBB03B;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: var(--color-cream);
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Outfit', sans-serif;
+      color: var(--color-dark-blue);
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    .permission-overlay {
+      background: var(--color-cream);
+      z-index: 100;
+    }
+    .font-unbounded { font-family: 'Unbounded', sans-serif; }
+    
+    .btn-minimal {
+      border: 1px solid var(--color-red);
+      background: transparent;
+      color: var(--color-red);
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .btn-minimal:hover {
+      background: var(--color-red);
+      color: #fff;
+    }
+    
+    /* 텍스트 배치를 더 깔끔하게 하는 보조 클래스 */
+    .minimal-text-spacing {
+      letter-spacing: 0.2em;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>
