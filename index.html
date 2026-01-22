@@ -202,9 +202,9 @@
         octx.fillRect(0, 0, offSize, offSize);
         octx.restore();
 
-        // 그래픽 요소(구슬/젬) 그리기 - 오버레이 모드 적용
+        // 그래픽 요소(구슬/젬) 그리기 - 겹칠수록 밝아지도록 'lighter' 적용
         octx.save();
-        octx.globalCompositeOperation = 'overlay'; 
+        octx.globalCompositeOperation = 'lighter'; 
         beadsRef.current.forEach(b => {
           octx.save();
           octx.translate(b.x, b.y); 
@@ -220,10 +220,7 @@
             octx.beginPath();
             octx.arc(0, 0, b.size/2, 0, Math.PI * 2);
             octx.fill();
-            // 약간의 발광 효과 (overlay와 함께 더 화려하게 표현됨)
-            octx.shadowBlur = 15;
-            octx.shadowColor = b.color;
-            octx.fill();
+            // 블러 제거
           }
           octx.restore();
         });
