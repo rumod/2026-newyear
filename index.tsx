@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 // 이미지 색상 테마 반영
 const THEME_PALETTE = ["#F15A2B", "#8CBEE3", "#212C3A", "#FBB03B", "#FFFFFF", "#FEF7E5"];
-// 장식 요소 추가: 꽃, 복주머니, 등불 등 명절 분위기 강화
+// 장식 요소: 말, 복, 2026, 반짝임, 꽃, 등불, 홍봉 등
 const GEMS_CONTENT = ["🐎", "福", "2026", "✨", "🌸", "🏮", "🧧", "🎊", "🌺", "🐎"];
 
 const KaleidoscopeCanvas = forwardRef(({ settings, videoStream }: { settings: any, videoStream: MediaStream | null }, ref) => {
@@ -17,10 +17,8 @@ const KaleidoscopeCanvas = forwardRef(({ settings, videoStream }: { settings: an
     const colorIndex = Math.floor(Math.random() * THEME_PALETTE.length);
     const color = THEME_PALETTE[colorIndex];
     
-    // 어두운 색상(#212C3A)인 경우 크기를 아주 작게 제한 (4~8), 그 외에는 일반 크기 (10~28)
     const isDark = color === "#212C3A";
     const randomSize = isDark ? (Math.random() * 4 + 4) : (Math.random() * 18 + 10);
-    
     const contentIndex = Math.floor(Math.random() * GEMS_CONTENT.length);
     
     return {
@@ -144,8 +142,7 @@ const KaleidoscopeCanvas = forwardRef(({ settings, videoStream }: { settings: an
 
     octx.save();
     octx.globalCompositeOperation = 'multiply';
-    // 붉은 색 테마에 맞춘 레이어 색상 변경 (#F15A2B 톤)
-    octx.fillStyle = '#F15A2B22'; // 연한 붉은 톤으로 곱하기 효과
+    octx.fillStyle = '#F15A2B22'; 
     octx.fillRect(0, 0, offSize, offSize);
     octx.restore();
 
@@ -228,13 +225,13 @@ const App = () => {
         <div className="fixed inset-0 flex flex-col items-center justify-start pt-[15vh] p-8 text-center permission-overlay z-[100]">
           <div className="w-full flex flex-col items-center mb-[10vh]">
             <h1 className="font-unbounded text-8xl md:text-9xl font-black text-[#F15A2B] tracking-tighter mb-4">2026</h1>
-            <p className="text-[11px] tracking-[1em] text-[#212C3A] uppercase">New Year Celebration</p>
+            <p className="text-[11px] tracking-[1em] text-[#212C3A] uppercase font-bold">New Year Celebration</p>
           </div>
           
           <div className="flex flex-col items-center gap-1 mt-auto mb-[15vh]">
             <button 
               onClick={(e) => { e.stopPropagation(); requestPermissions(); }} 
-              className="btn-minimal px-20 py-4 rounded-full text-sm tracking-[0.4em] uppercase font-bold mb-3"
+              className="btn-minimal px-20 py-4 rounded-full text-sm tracking-[0.4em] uppercase font-bold mb-3 shadow-sm"
             >
               Start
             </button>
