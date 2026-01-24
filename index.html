@@ -57,7 +57,7 @@
     import { createRoot } from 'https://esm.sh/react-dom@19.0.0/client';
 
     const THEME_PALETTE = ["#F15A2B", "#8CBEE3", "#212C3A", "#FBB03B", "#FFFFFF", "#FEF7E5"];
-    const GEMS_CONTENT = ["🐎", "福", "2026", "✨", "🌸", "🏮", "🧧", "🎊", "🌺", "🐎"];
+    const GEMS_CONTENT = ["🐎", "福", "2026", "✨", "🌸", "🏮", "🧧", "🎊", "🌺", "🐎", "🧧", "💫"];
 
     const KaleidoscopeCanvas = forwardRef(({ settings, videoStream }, ref) => {
       const canvasRef = useRef(null);
@@ -116,15 +116,15 @@
             spawnY = (Math.random() - 0.5) * radius * 0.4;
           }
 
-          const count = Math.floor(Math.random() * 4) + 4;
+          const count = Math.floor(Math.random() * 5) + 5;
           for (let i = 0; i < count; i++) {
             beadsRef.current.push(createBead({
               x: spawnX, y: spawnY,
-              vx: (Math.random() - 0.5) * 18, vy: (Math.random() - 0.5) * 18,
+              vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20,
               vRot: (Math.random() - 0.5) * 0.8
             }));
           }
-          if (beadsRef.current.length > 120) beadsRef.current = beadsRef.current.slice(-120);
+          if (beadsRef.current.length > 150) beadsRef.current = beadsRef.current.slice(-150);
         }
       }));
 
@@ -153,7 +153,7 @@
           canvas.width = w; canvas.height = h; 
         }
 
-        const radius = Math.hypot(w, h) * 0.6 * settings.zoom;
+        const radius = Math.hypot(w, h) * 0.55 * settings.zoom;
         const slice = (Math.PI * 2) / settings.segments;
 
         if (!offscreenRef.current) offscreenRef.current = document.createElement('canvas');
@@ -183,26 +183,33 @@
 
         octx.clearRect(0, 0, offSize, offSize);
         
-        // 배경 비디오 레이어
+        // 배경 비디오 레이어 - 더 넓은 영역을 담도록 개선
         if (videoRef.current && videoRef.current.readyState >= 2) {
           const vw = videoRef.current.videoWidth, vh = videoRef.current.videoHeight;
-          const vScale = Math.max(offSize/vw, offSize/vh);
+          // 카메라 화면이 반지름을 충분히 덮으면서도 시야가 너무 좁지 않게 0.85 계수 적용
+          const vScale = Math.max(offSize / vw, offSize / vh) * 0.85; 
           octx.save();
-          octx.translate(offSize/2, offSize/2);
           octx.scale(-1, 1);
-          octx.globalAlpha = 0.5;
-          octx.drawImage(videoRef.current, -vw*vScale/2, -vh*vScale/2, vw*vScale, vh*vScale);
+          octx.globalAlpha = 0.6;
+          // 카메라 중심이 캔버스 좌상단(만화경 중심)에 오도록 오프셋 조절
+          octx.drawImage(
+            videoRef.current, 
+            -vw * vScale * 0.5, 
+            -vh * vScale * 0.5, 
+            vw * vScale, 
+            vh * vScale
+          );
           octx.restore();
         }
 
         // 스크린(밝게 하기) 모드 적용 - 배경 베이스
         octx.save();
         octx.globalCompositeOperation = 'screen'; 
-        octx.fillStyle = '#F15A2B33'; 
+        octx.fillStyle = '#F15A2B22'; 
         octx.fillRect(0, 0, offSize, offSize);
         octx.restore();
 
-        // 그래픽 요소(구슬/젬) 그리기 - 겹칠수록 밝아지도록 'lighter' 적용
+        // 그래픽 요소(구슬/젬) 그리기
         octx.save();
         octx.globalCompositeOperation = 'lighter'; 
         beadsRef.current.forEach(b => {
@@ -252,9 +259,10 @@
 
     const App = () => {
       const [permissionGranted, setPermissionGranted] = useState(false);
-      const settings = { segments: 12, zoom: 1.6 };
       const [videoStream, setVideoStream] = useState(null);
       const kaleidoscopeRef = useRef(null);
+      // zoom을 1.2 정도로 낮추어 더 많은 물리적 공간이 화면에 들어오도록 조정
+      const settings = { segments: 12, zoom: 1.2 };
 
       const requestPermissions = async () => {
         if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
@@ -262,7 +270,13 @@
         }
         
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+              facingMode: 'environment',
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            } 
+          });
           setVideoStream(stream);
         } catch (e) {
           console.warn("Camera access denied", e);
@@ -307,11 +321,12 @@
           )}
 
           {permissionGranted && (
-            <div className="absolute inset-x-0 top-[100px] text-center pointer-events-none z-50 flex flex-col items-center">
-               <h2 className="font-unbounded text-2xl md:text-3xl font-black text-white tracking-[0.2em] mb-3">
-                 HAPPY NEW YEAR
+            <div className="absolute inset-x-0 top-[100px] text-center pointer-events-none z-50 flex flex-col items-center px-4">
+               <h2 className="font-unbounded text-2xl md:text-4xl font-black text-white tracking-[0.2em] mb-3 leading-tight drop-shadow-lg">
+                 <span className="block md:inline">HAPPY</span>
+                 <span className="block md:inline md:ml-4">NEW YEAR</span>
                </h2>
-               <p className="text-[10px] tracking-[0.4em] text-white/60 font-bold uppercase">
+               <p className="text-[10px] tracking-[0.4em] text-white/80 font-bold uppercase drop-shadow-md">
                  Shake or Touch
                </p>
             </div>
