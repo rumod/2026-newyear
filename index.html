@@ -20,7 +20,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: var(--color-cream);
+      background-color: var(--color-dark-blue);
       touch-action: none;
       -webkit-tap-highlight-color: transparent;
       font-family: 'Outfit', sans-serif;
@@ -47,6 +47,9 @@
       background: var(--color-red);
       color: #fff;
     }
+    .drop-shadow-strong {
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+    }
   </style>
 </head>
 <body>
@@ -71,7 +74,7 @@
         const color = THEME_PALETTE[colorIndex];
         
         const isDark = color === "#212C3A";
-        const randomSize = isDark ? (Math.random() * 4 + 4) : (Math.random() * 18 + 10);
+        const randomSize = isDark ? (Math.random() * 4 + 4) : (Math.random() * 20 + 12);
         const contentIndex = Math.floor(Math.random() * GEMS_CONTENT.length);
         
         return {
@@ -96,7 +99,8 @@
           if (!canvas) return;
           const rect = canvas.getBoundingClientRect();
           const w = rect.width, h = rect.height;
-          const radius = Math.hypot(w, h) * 0.5 * settings.zoom;
+          // 반경 내에서만 생성되도록 radius 설정
+          const radius = Math.hypot(w, h) * 0.5;
           const sliceAngle = (Math.PI * 2) / settings.segments;
 
           let spawnX, spawnY;
@@ -112,19 +116,19 @@
             spawnX = Math.cos(localAngle) * dist;
             spawnY = Math.sin(localAngle) * dist;
           } else {
-            spawnX = (Math.random() - 0.5) * radius * 0.4;
-            spawnY = (Math.random() - 0.5) * radius * 0.4;
+            spawnX = (Math.random() - 0.5) * radius * 0.6;
+            spawnY = (Math.random() - 0.5) * radius * 0.6;
           }
 
-          const count = Math.floor(Math.random() * 5) + 5;
+          const count = Math.floor(Math.random() * 6) + 6;
           for (let i = 0; i < count; i++) {
             beadsRef.current.push(createBead({
               x: spawnX, y: spawnY,
-              vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20,
-              vRot: (Math.random() - 0.5) * 0.8
+              vx: (Math.random() - 0.5) * 22, vy: (Math.random() - 0.5) * 22,
+              vRot: (Math.random() - 0.5) * 1.0
             }));
           }
-          if (beadsRef.current.length > 150) beadsRef.current = beadsRef.current.slice(-150);
+          if (beadsRef.current.length > 200) beadsRef.current = beadsRef.current.slice(-200);
         }
       }));
 
@@ -153,7 +157,8 @@
           canvas.width = w; canvas.height = h; 
         }
 
-        const radius = Math.hypot(w, h) * 0.55 * settings.zoom;
+        // 화면 끝까지 채우기 위한 반경 계산 (대각선 길이의 절반 이상)
+        const radius = Math.hypot(w, h) * 0.52;
         const slice = (Math.PI * 2) / settings.segments;
 
         if (!offscreenRef.current) offscreenRef.current = document.createElement('canvas');
@@ -166,10 +171,10 @@
 
         beadsRef.current = beadsRef.current.filter(b => {
           const age = (time - b.createdAt) / 1000;
-          if (age >= 3.5) return false;
-          b.alpha = age > 2.5 ? 1 - (age - 2.5) / 1.0 : 1;
-          b.vx *= 0.98; b.vy *= 0.98;
-          b.vy += 0.05; 
+          if (age >= 4.0) return false;
+          b.alpha = age > 3.0 ? 1 - (age - 3.0) / 1.0 : 1;
+          b.vx *= 0.985; b.vy *= 0.985;
+          b.vy += 0.04; 
           b.x += b.vx; b.y += b.vy;
           b.rot += b.vRot;
           const d = Math.hypot(b.x, b.y);
@@ -183,15 +188,16 @@
 
         octx.clearRect(0, 0, offSize, offSize);
         
-        // 배경 비디오 레이어 - 더 넓은 영역을 담도록 개선
+        // 배경 비디오 레이어 - 화면 끝까지 빈틈없이 꽉 채우도록 스케일 조정
         if (videoRef.current && videoRef.current.readyState >= 2) {
           const vw = videoRef.current.videoWidth, vh = videoRef.current.videoHeight;
-          // 카메라 화면이 반지름을 충분히 덮으면서도 시야가 너무 좁지 않게 0.85 계수 적용
-          const vScale = Math.max(offSize / vw, offSize / vh) * 0.85; 
+          // 비디오의 절반이 반지름을 덮어야 함
+          const vScale = Math.max(radius * 2 / vw, radius * 2 / vh); 
           octx.save();
+          // 만화경 중심이 비디오의 중앙이 되도록 배치
+          octx.translate(0, 0); 
           octx.scale(-1, 1);
-          octx.globalAlpha = 0.6;
-          // 카메라 중심이 캔버스 좌상단(만화경 중심)에 오도록 오프셋 조절
+          octx.globalAlpha = 0.7;
           octx.drawImage(
             videoRef.current, 
             -vw * vScale * 0.5, 
@@ -202,14 +208,14 @@
           octx.restore();
         }
 
-        // 스크린(밝게 하기) 모드 적용 - 배경 베이스
+        // 색상 보정 레이어
         octx.save();
-        octx.globalCompositeOperation = 'screen'; 
-        octx.fillStyle = '#F15A2B22'; 
+        octx.globalCompositeOperation = 'overlay'; 
+        octx.fillStyle = '#F15A2B11'; 
         octx.fillRect(0, 0, offSize, offSize);
         octx.restore();
 
-        // 그래픽 요소(구슬/젬) 그리기
+        // 구슬 요소 그리기
         octx.save();
         octx.globalCompositeOperation = 'lighter'; 
         beadsRef.current.forEach(b => {
@@ -232,14 +238,14 @@
         });
         octx.restore();
 
-        // 메인 캔버스에 만화경 패턴으로 복제
-        ctx.fillStyle = '#FEF7E5'; ctx.fillRect(0,0,w,h);
+        // 메인 캔버스 렌더링
+        ctx.fillStyle = '#111'; ctx.fillRect(0,0,w,h);
         ctx.save();
         ctx.translate(w/2, h/2);
         for(let i=0; i<settings.segments; i++) {
           ctx.save();
           ctx.rotate(i * slice);
-          ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,radius,0,slice+0.01); ctx.clip();
+          ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,radius,0,slice + 0.005); ctx.clip();
           if(i%2===1) { ctx.scale(1,-1); ctx.rotate(-slice); }
           ctx.drawImage(offscreenRef.current, 0, 0);
           ctx.restore();
@@ -261,8 +267,7 @@
       const [permissionGranted, setPermissionGranted] = useState(false);
       const [videoStream, setVideoStream] = useState(null);
       const kaleidoscopeRef = useRef(null);
-      // zoom을 1.2 정도로 낮추어 더 많은 물리적 공간이 화면에 들어오도록 조정
-      const settings = { segments: 12, zoom: 1.2 };
+      const settings = { segments: 12 };
 
       const requestPermissions = async () => {
         if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
@@ -284,7 +289,7 @@
 
         const handleMotion = (e) => {
           const acc = e.accelerationIncludingGravity;
-          if (acc && (Math.abs(acc.x || 0) > 11 || Math.abs(acc.y || 0) > 11)) {
+          if (acc && (Math.abs(acc.x || 0) > 12 || Math.abs(acc.y || 0) > 12)) {
             kaleidoscopeRef.current?.handleAction();
           }
         };
@@ -294,7 +299,7 @@
       };
 
       return (
-        <div className="relative w-full h-screen overflow-hidden" onPointerDown={(e) => kaleidoscopeRef.current?.handleAction(e)}>
+        <div className="relative w-full h-screen overflow-hidden bg-black" onPointerDown={(e) => kaleidoscopeRef.current?.handleAction(e)}>
           <KaleidoscopeCanvas ref={kaleidoscopeRef} settings={settings} videoStream={videoStream} />
           
           {!permissionGranted && (
@@ -322,11 +327,11 @@
 
           {permissionGranted && (
             <div className="absolute inset-x-0 top-[100px] text-center pointer-events-none z-50 flex flex-col items-center px-4">
-               <h2 className="font-unbounded text-2xl md:text-4xl font-black text-white tracking-[0.2em] mb-3 leading-tight drop-shadow-lg">
+               <h2 className="font-unbounded text-3xl md:text-5xl font-black text-white tracking-[0.2em] mb-4 leading-tight drop-shadow-2xl">
                  <span className="block md:inline">HAPPY</span>
                  <span className="block md:inline md:ml-4">NEW YEAR</span>
                </h2>
-               <p className="text-[10px] tracking-[0.4em] text-white/80 font-bold uppercase drop-shadow-md">
+               <p className="text-[11px] tracking-[0.5em] text-white/90 font-bold uppercase drop-shadow-lg bg-black/20 px-4 py-1 rounded-full backdrop-blur-sm">
                  Shake or Touch
                </p>
             </div>
