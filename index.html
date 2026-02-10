@@ -6,7 +6,7 @@
   <title>2026 만화경 연하장</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;900&family=Outfit:wght@200;600&family=Noto+Sans+KR:wght@300;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;400;900&family=Outfit:wght@200;600;900&family=Noto+Sans+KR:wght@300;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     :root {
@@ -39,16 +39,49 @@
     
     .btn-minimal {
       border: 1px solid var(--color-red);
-      background: transparent;
-      color: var(--color-red);
+      background: var(--color-red);
+      color: #fff;
       transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     }
     .btn-minimal:hover {
       background: var(--color-red);
       color: #fff;
+      filter: brightness(1.1);
+      transform: scale(1.02) translateY(0px);
     }
+    
+    @keyframes bounce-floor {
+      0%, 100% { 
+        transform: translateY(0px) scaleY(1); 
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1); 
+      }
+      50% { 
+        transform: translateY(-8px) scaleY(1.02); 
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1); 
+      }
+    }
+    .animate-bounce-floor {
+      animation: bounce-floor 1.15s infinite; 
+    }
+
     .drop-shadow-strong {
       filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+    }
+    
+    .text-2026-custom {
+      font-weight: 200;
+      letter-spacing: -0.02em;
+    }
+
+    .text-nyc-custom {
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+
+    .emoji-icon-static {
+      filter: grayscale(1) brightness(10);
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -99,7 +132,6 @@
           if (!canvas) return;
           const rect = canvas.getBoundingClientRect();
           const w = rect.width, h = rect.height;
-          // 반경 내에서만 생성되도록 radius 설정
           const radius = Math.hypot(w, h) * 0.5;
           const sliceAngle = (Math.PI * 2) / settings.segments;
 
@@ -120,15 +152,15 @@
             spawnY = (Math.random() - 0.5) * radius * 0.6;
           }
 
-          const count = Math.floor(Math.random() * 6) + 6;
+          const count = Math.floor(Math.random() * 8) + 8;
           for (let i = 0; i < count; i++) {
             beadsRef.current.push(createBead({
               x: spawnX, y: spawnY,
-              vx: (Math.random() - 0.5) * 22, vy: (Math.random() - 0.5) * 22,
-              vRot: (Math.random() - 0.5) * 1.0
+              vx: (Math.random() - 0.5) * 30, vy: (Math.random() - 0.5) * 30,
+              vRot: (Math.random() - 0.5) * 1.2
             }));
           }
-          if (beadsRef.current.length > 200) beadsRef.current = beadsRef.current.slice(-200);
+          if (beadsRef.current.length > 250) beadsRef.current = beadsRef.current.slice(-250);
         }
       }));
 
@@ -157,7 +189,6 @@
           canvas.width = w; canvas.height = h; 
         }
 
-        // 화면 끝까지 채우기 위한 반경 계산 (대각선 길이의 절반 이상)
         const radius = Math.hypot(w, h) * 0.52;
         const slice = (Math.PI * 2) / settings.segments;
 
@@ -173,8 +204,8 @@
           const age = (time - b.createdAt) / 1000;
           if (age >= 4.0) return false;
           b.alpha = age > 3.0 ? 1 - (age - 3.0) / 1.0 : 1;
-          b.vx *= 0.985; b.vy *= 0.985;
-          b.vy += 0.04; 
+          b.vx *= 0.98; b.vy *= 0.98;
+          b.vy += 0.05;
           b.x += b.vx; b.y += b.vy;
           b.rot += b.vRot;
           const d = Math.hypot(b.x, b.y);
@@ -188,14 +219,10 @@
 
         octx.clearRect(0, 0, offSize, offSize);
         
-        // 배경 비디오 레이어 - 화면 끝까지 빈틈없이 꽉 채우도록 스케일 조정
         if (videoRef.current && videoRef.current.readyState >= 2) {
           const vw = videoRef.current.videoWidth, vh = videoRef.current.videoHeight;
-          // 비디오의 절반이 반지름을 덮어야 함
           const vScale = Math.max(radius * 2 / vw, radius * 2 / vh); 
           octx.save();
-          // 만화경 중심이 비디오의 중앙이 되도록 배치
-          octx.translate(0, 0); 
           octx.scale(-1, 1);
           octx.globalAlpha = 0.7;
           octx.drawImage(
@@ -208,14 +235,12 @@
           octx.restore();
         }
 
-        // 색상 보정 레이어
         octx.save();
         octx.globalCompositeOperation = 'overlay'; 
         octx.fillStyle = '#F15A2B11'; 
         octx.fillRect(0, 0, offSize, offSize);
         octx.restore();
 
-        // 구슬 요소 그리기
         octx.save();
         octx.globalCompositeOperation = 'lighter'; 
         beadsRef.current.forEach(b => {
@@ -238,7 +263,6 @@
         });
         octx.restore();
 
-        // 메인 캔버스 렌더링
         ctx.fillStyle = '#111'; ctx.fillRect(0,0,w,h);
         ctx.save();
         ctx.translate(w/2, h/2);
@@ -289,7 +313,7 @@
 
         const handleMotion = (e) => {
           const acc = e.accelerationIncludingGravity;
-          if (acc && (Math.abs(acc.x || 0) > 12 || Math.abs(acc.y || 0) > 12)) {
+          if (acc && (Math.abs(acc.x || 0) > 10 || Math.abs(acc.y || 0) > 10 || Math.abs(acc.z || 0) > 10)) {
             kaleidoscopeRef.current?.handleAction();
           }
         };
@@ -304,19 +328,18 @@
           
           {!permissionGranted && (
             <div className="fixed inset-0 flex flex-col items-center justify-start pt-[15vh] p-8 text-center permission-overlay z-[100]">
-              <div className="w-full flex flex-col items-center mb-[10vh]">
-                <h1 className="font-unbounded text-8xl md:text-9xl font-black text-[#F15A2B] tracking-tighter mb-4">2026</h1>
-                <p className="text-[11px] tracking-[1em] text-[#212C3A] uppercase font-bold">New Year Celebration</p>
+              <div className="w-full flex flex-col items-center mb-[8vh]">
+                <h1 className="font-unbounded text-8xl md:text-9xl text-2026-custom text-[#212C3A] mb-4">2026</h1>
+                <p className="text-[18px] md:text-2xl text-nyc-custom text-[#F15A2B] uppercase">New Year Celebration</p>
               </div>
               
-              <div className="flex flex-col items-center gap-1 mt-auto mb-[15vh]">
+              <div className="flex flex-col items-center gap-1 mt-auto mb-[20vh]">
                 <button 
                   onClick={(e) => { e.stopPropagation(); requestPermissions(); }} 
-                  className="btn-minimal px-20 py-4 rounded-full text-sm tracking-[0.4em] uppercase font-bold mb-3 shadow-sm"
+                  className="btn-minimal px-20 py-4 rounded-full text-sm tracking-[0.4em] uppercase font-bold shadow-sm animate-bounce-floor"
                 >
                   Start
                 </button>
-                <p className="text-[12px] text-[#F15A2B] font-bold">핸드폰을 흔들거나 화면을 터치하세요</p>
               </div>
               
               <div className="absolute bottom-12 left-0 right-0 text-center text-[10px] tracking-[0.3em] text-[#8CBEE3] font-bold uppercase px-4">
@@ -327,12 +350,16 @@
 
           {permissionGranted && (
             <div className="absolute inset-x-0 top-[100px] text-center pointer-events-none z-50 flex flex-col items-center px-4">
-               <h2 className="font-unbounded text-3xl md:text-5xl font-black text-white tracking-[0.2em] mb-4 leading-tight drop-shadow-2xl">
-                 <span className="block md:inline">HAPPY</span>
-                 <span className="block md:inline md:ml-4">NEW YEAR</span>
-               </h2>
-               <p className="text-[11px] tracking-[0.5em] text-white/90 font-bold uppercase drop-shadow-lg bg-black/20 px-4 py-1 rounded-full backdrop-blur-sm">
-                 Shake or Touch
+               <div className="flex items-center justify-center gap-4 mb-4">
+                 <span className="text-xl md:text-2xl emoji-icon-static">🐎</span>
+                 <h2 className="text-3xl md:text-5xl font-black text-white tracking-[0.2em] leading-tight drop-shadow-2xl">
+                   <span className="block md:inline">HAPPY</span>
+                   <span className="block md:inline md:ml-4">NEW YEAR</span>
+                 </h2>
+                 <span className="text-xl md:text-2xl emoji-icon-static">✨</span>
+               </div>
+               <p className="text-[11px] tracking-[0.2em] text-white/90 font-bold drop-shadow-lg bg-black/20 px-6 py-1.5 rounded-full backdrop-blur-sm font-['Noto_Sans_KR']">
+                 핸드폰을 흔들거나 화면을 터치하세요
                </p>
             </div>
           )}
