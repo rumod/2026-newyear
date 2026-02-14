@@ -4,27 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
-  <!-- SEO 설정 -->
+  <!-- SEO 및 페이지 정보 -->
   <title>2026 연하장 | 2026 New Year Celebration</title>
   <meta name="description" content="구글 AI Studio로 만든 만화경 연하장. 만든이: work.kyung@gmail.com">
   <meta name="keywords" content="2026, 연하장, 만화경, 새해인사, 병오년, 디지털아트, Kaleidoscope, New Year Card, 2026년 인사말">
   <meta name="author" content="work.kyung@gmail.com">
   
-  <!-- 오픈그래프 (Facebook, Kakao, Instagram 등) -->
+  <!-- 오픈그래프 (카카오톡, 페이스북 등 공유 미리보기) -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="2026 연하장 | 2026 New Year Celebration">
   <meta property="og:description" content="구글 AI Studio로 만든 만화경 연하장. 만든이: work.kyung@gmail.com">
-  <meta property="og:image" content="./og-image.png">
-  <meta property="og:url" content="https://kaleidoscope-2026.example.com">
+  <meta property="og:image" content="./og-image.png"> <!-- 루트 폴더에 og-image.png 파일이 있어야 합니다 -->
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="window.location.href">
   <meta property="og:site_name" content="2026 만화경 연하장">
   
-  <!-- Twitter Card -->
+  <!-- Twitter Card (X 공유 미리보기) -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="2026 연하장 | 2026 New Year Celebration">
   <meta name="twitter:description" content="구글 AI Studio로 만든 만화경 연하장. 만든이: work.kyung@gmail.com">
   <meta name="twitter:image" content="./og-image.png">
 
-  <!-- 파비콘 설정: 🐎 말 이모지를 사용한 SVG 파비콘 (반짝이를 원하시면 🐎 대신 ✨를 넣으세요) -->
+  <!-- 파비콘: 말 이모지(🐎) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐎</text></svg>">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -105,6 +107,24 @@
     .emoji-icon-static {
       filter: grayscale(1) brightness(10);
       opacity: 0.9;
+    }
+
+    .share-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 1000;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.2);
     }
   </style>
 </head>
@@ -316,6 +336,23 @@
       const kaleidoscopeRef = useRef(null);
       const settings = { segments: 12 };
 
+      const handleShare = async (e) => {
+        e.stopPropagation();
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: '2026 연하장 | 2026 New Year Celebration',
+              text: '구글 AI Studio로 만든 특별한 만화경 연하장을 확인해보세요!',
+              url: window.location.href,
+            });
+          } catch (err) {
+            console.log('공유 실패 또는 취소:', err);
+          }
+        } else {
+          alert('공유하기 기능이 지원되지 않는 브라우저입니다. 링크를 복사해주세요!');
+        }
+      };
+
       const requestPermissions = async () => {
         if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
           try { await DeviceMotionEvent.requestPermission(); } catch (e) { console.error(e); }
@@ -349,6 +386,12 @@
         <div className="relative w-full h-screen overflow-hidden bg-black" onPointerDown={(e) => kaleidoscopeRef.current?.handleAction(e)}>
           <KaleidoscopeCanvas ref={kaleidoscopeRef} settings={settings} videoStream={videoStream} />
           
+          {permissionGranted && (
+            <div className="share-btn" onClick={handleShare}>
+              <i className="fa-solid fa-share-nodes"></i>
+            </div>
+          )}
+
           {!permissionGranted && (
             <div className="fixed inset-0 flex flex-col items-center permission-overlay z-[100]">
               {/* HEADER */}
@@ -370,7 +413,7 @@
               {/* BOTTOM FOOTER */}
               <div className="w-full text-center text-[#8CBEE3] font-bold px-4 flex flex-col gap-1.5 items-center pb-12">
                  <span className="font-['Noto_Sans_KR'] text-[11px] tracking-widest text-[#212C3A] opacity-90">카메라 및 동작 센서 접근을 허용해 주세요</span>
-                 <span className="text-[10px] tracking-[0.3em] uppercase opacity-70">Camera & Motion Sensor permissions required</span>
+                 <span className="text-[10px] text-[#8CBEE3] tracking-[0.1em] font-light mt-2">work.kyung@gmail.com</span>
               </div>
             </div>
           )}
