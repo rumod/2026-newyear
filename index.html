@@ -4,48 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
-  <!-- SEO 및 페이지 정보 -->
+  <!-- SEO 및 브라우저 탭 제목 -->
   <title>2026 새해 복 많이 받으세요!</title>
   <meta name="description" content="Google AI Studio로 만든 만화경 연하장. 만든이: work.kyung@gmail.com">
-  <meta name="keywords" content="2026, 연하장, 만화경, 새해인사, 병오년, 디지털아트, Kaleidoscope, New Year Card, 2026년 인사말">
   <meta name="author" content="work.kyung@gmail.com">
-  
-  <!-- 오픈그래프 (카카오톡, 페이스북 등 공유 미리보기) -->
+
+  <!-- 오픈그래프 (카카오톡, 페이스북) -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="2026 연하장 ⟡ 핸드폰으로 보세요">
   <meta property="og:description" content="Google AI Studio로 만든 만화경 연하장. 만든이: work.kyung@gmail.com">
-  <meta id="og-image" property="og:image" content="og-image.png">
+  <meta id="og-image" property="og:image" content="./og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta id="og-url" property="og:url" content="">
   <meta property="og:site_name" content="2026 새해 복 많이 받으세요!">
   
-  <!-- Twitter Card -->
+  <!-- Twitter Card (X) - 썸네일 노출 핵심 -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta id="twitter-domain" name="twitter:domain" content="">
+  <meta id="twitter-url" name="twitter:url" content="">
   <meta name="twitter:title" content="2026 연하장 ⟡ 핸드폰으로 보세요">
   <meta name="twitter:description" content="Google AI Studio로 만든 만화경 연하장. 만든이: work.kyung@gmail.com">
-  <meta id="twitter-image" name="twitter:image" content="og-image.png">
+  <meta id="twitter-image" name="twitter:image" content="./og-image.png">
+  <meta id="twitter-image-src" name="twitter:image:src" content="og-image.png">
 
-  <!-- 메타 태그 동적 보정 스크립트: 상대 경로를 절대 경로로 변환 -->
+  <!-- 메타 태그 동적 절대 경로 보정 (자바스크립트 미지원 크롤러 대비) -->
   <script>
     (function() {
-      const currentUrl = window.location.href.split('?')[0].split('#')[0];
-      const origin = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
-      const imageUrl = origin + '/og-image.png';
-      
-      document.getElementById('og-url').setAttribute('content', currentUrl);
-      document.getElementById('og-image').setAttribute('content', imageUrl);
-      document.getElementById('twitter-image').setAttribute('content', imageUrl);
+      try {
+        const currentUrl = window.location.href.split('?')[0].split('#')[0];
+        const origin = window.location.origin;
+        const path = window.location.pathname;
+        const directory = path.substring(0, path.lastIndexOf('/'));
+        // 정확한 절대 경로 생성
+        const absoluteBase = origin + directory;
+        const imageUrl = absoluteBase + '/og-image.png';
+        
+        // 메타 태그 업데이트
+        const setAttr = (id, attr, val) => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute(attr, val);
+        };
+
+        setAttr('og-url', 'content', currentUrl);
+        setAttr('og-image', 'content', imageUrl);
+        setAttr('twitter-domain', 'content', window.location.hostname);
+        setAttr('twitter-url', 'content', currentUrl);
+        setAttr('twitter-image', 'content', imageUrl);
+        setAttr('twitter-image-src', 'content', imageUrl);
+      } catch (e) {
+        console.error('Meta fix failed', e);
+      }
     })();
   </script>
 
-  <!-- 파비콘: 말 이모지(🐎) -->
+  <!-- 파비콘 -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐎</text></svg>">
 
+  <!-- 외부 리소스 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;400;900&family=Outfit:wght@200;600;900&family=Noto+Sans+KR:wght@300;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
   <style>
     :root {
       --color-cream: #FEF7E5;
