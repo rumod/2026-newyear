@@ -28,7 +28,7 @@
   <meta id="twitter-image" name="twitter:image" content="og-image.png?v=1.2">
   <meta id="twitter-image-src" name="twitter:image:src" content="og-image.png?v=1.2">
 
-  <!-- 메타 태그 동적 절대 경로 보정 (자바스크립트 미지원 크롤러 대비) -->
+  <!-- 메타 태그 동적 절대 경로 보정 -->
   <script>
     (function() {
       try {
@@ -36,11 +36,9 @@
         const origin = window.location.origin;
         const path = window.location.pathname;
         const directory = path.substring(0, path.lastIndexOf('/'));
-        // 정확한 절대 경로 생성
         const absoluteBase = origin + directory;
         const imageUrl = absoluteBase + '/og-image.png';
         
-        // 메타 태그 업데이트
         const setAttr = (id, attr, val) => {
           const el = document.getElementById(id);
           if (el) el.setAttribute(attr, val);
@@ -446,7 +444,7 @@
               
               {/* BOTTOM FOOTER */}
               <div className="w-full text-center text-[#8CBEE3] font-bold px-4 flex flex-col gap-1.5 items-center pb-12">
-                 <span className="font-['Noto_Sans_KR'] text-[11px] tracking-widest text-[#212C3A] opacity-90">카메라 및 동작 센서 접근을 허용해 주세요</span>
+                 <span className="font-['Noto_Sans_KR'] text-[11px] tracking-widest text-[#212C3A] opacity-90">카메라와 동작 센서 접근을 허용해 주세요</span>
                  <span className="text-[13px] text-[#8CBEE3] tracking-[0.1em] font-light mt-2">work.kyung@gmail.com</span>
               </div>
             </div>
@@ -463,7 +461,7 @@
                  <span className="text-xl md:text-2xl emoji-icon-static">✨</span>
                </div>
                <p className="text-[11px] tracking-[0.2em] text-white/90 font-bold drop-shadow-lg bg-black/20 px-6 py-1.5 rounded-full backdrop-blur-sm font-['Noto_Sans_KR']">
-                 핸드폰을 흔들거나 화면을 터치하세요
+                 휴대폰을 흔들거나 화면을 터치해 주세요
                </p>
             </div>
           )}
